@@ -1,0 +1,73 @@
+#We take "anaerobiske forhold på bunnen"
+
+file_anaer_path <- paste0(basefolder_od, "GIS Data/Ecological components data/11. Plankton/11.3 Anaerobiske forhold paa bunnen/Fiskeridir_Fjorder Salten/Fiskeridir_Fjorder Salten.shp" ) 
+
+# convert to a simple features (sf) dataframe
+shp_anaer <- sf::read_sf(file_anaer_path, quiet = TRUE)
+
+# get the projection from the geonorge layer - we will use this as the basis for our work
+crs_proj <- sf::st_crs(shp_water)
+
+# Transform to UTM 33
+shp_anaer_proj <- shp_anaer %>%
+  sf::st_transform(crs = crs_proj)
+
+# Clip shp_anaer_proj to the extent of shp_1108
+shp_anaer_clipped <- sf::st_intersection(shp_anaer_proj, shp_1108)
+
+#conversion of Shp_anaer_clipped
+r_anaer <- terra::rasterize(shp_anaer_clipped, r, field = 1, background = NA)
+
+anaer_shp <- terra::as.polygons(r_anaer, aggregate=F) %>%
+  sf::st_as_sf()
+
+# Plot the raster
+#plot(r_anaer, col = "grey", main = "Anaerobiske bunnforhold")
+
+# Plot using ggplot
+p<- ggplot() +
+  geom_sf(data = shp_water, colour = NA, fill = "lightblue", alpha = 0.5) + 
+  geom_sf(data = rw_shp, colour = "grey", fill = "blue", alpha = 0.1) + 
+  geom_sf(data = shp_1108, colour = "red", fill = NA) + 
+  geom_sf(data = anaer_shp, color=NA,fill = "black", alpha = 1) +
+  #scale_fill_gradient(low = "black", high = "black", na.value = NA) +
+  #geom_sf(data = shp_anaer_clipped, colour = "black", fill = "black") + 
+  theme_minimal() + 
+  coord_sf(xlim = c(x0, x1), ylim = c(y0, y1), datum = 25833) +
+  labs(subtitle = "Anaerobiske bunnforhold Salten") 
+  #scale_fill_manual(values = c("blue", "red"), guide = "none") +
+  #scale_alpha_manual(values = c(0.1, 0.3), guide = "none")
+
+
+# Convert raster to data frame
+r_anaer_df <- as.data.frame(r_anaer, xy = TRUE)
+colnames(r_anaer_df) <- c("x", "y", "value")
+
+# Save the data frame as a CSV and .tiff file
+basefolder_processed <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe - METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/Data collection/Processed GIS Data/"
+output_dir <- paste0(basefolder_processed, "ecological/11. plankton/")
+output_csv_path <- paste0(output_dir, "r_anaer_georeferenced.csv")
+output_tiff_path <- paste0(output_dir, "anaerobiske_bunnforhold_plot_Salten.tiff")
+
+# Ensure the directory exists
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir, recursive = TRUE)
+}
+
+write.csv(r_anaer_df, file = output_csv_path, row.names = FALSE)
+
+#we use GGSAVE for "se" the results while we work. The results is in .tiff
+ggsave(output_tiff_path, plot = p, width = 10, height = 8, dpi = 300)
+output_path <- paste0(dirname(file_anaer_path), "/anaerobiske_bunnforhold_plot_Salten.tiff")
+
+# Save the raster only as a .tiff
+terra::writeRaster(r_anaer, filename = output_tiff_path, overwrite = TRUE)
+
+#Alternatively we use GGSAVE for "se" the results while we work. The results is here in .png
+#ggsave(p, filename= "anaerobiske_bunnforhold_plot_Salten.png", width = 10, height = 10, units = "cm", dpi = 300, bg="white")
+#output_path <- paste0(dirname(file_anaer_path), "/anaerobiske_bunnforhold_plot_Salten.png")
+
+
+# Print the paths to the saved files
+cat("Georeferenced CSV saved to:", output_csv_path, "\n")
+cat("Georeferenced TIFF saved to:", output_tiff_path, "\n")
