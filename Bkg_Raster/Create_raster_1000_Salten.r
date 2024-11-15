@@ -142,18 +142,11 @@ ggsave(p2, file=paste0(folder_output_od, "/plot_salten_raster1000.png"), width=1
 
 #The masked water raster has the same number of cells as the original raster. The masked-out cells are given an NA value.
 
-#We can see the difference by taking the cell values from the unmasked and masked rasters and then comparing the total number of values with the number of non-NA values
+ # Save the results as .rds files
+  saveRDS(shp_1108, file = paste0(folder_output_od, "shp_1108_1000.rds"))
+  saveRDS(shp_water, file = paste0(folder_output_od, "shp_water.rds"))
+  saveRDS(rw_shp, file = paste0(folder_output_od, "rw_shp.rds"))
 
-values_r <- values(r)
-length(values_r)
-## [1] 8330
-length(values_r[!is.na(values_r)])
-## [1] 8330
-values_rw <- values(rw)
-length(values_rw)
-## [1] 8330
-length(values_rw[!is.na(values_rw)])
-## [1] 3182
 
 #Now we can use the unmasked raster r as a template for rasterising vector data and use the masked raster rw to mask the resulting rasters so that only water cells are “active”.
 

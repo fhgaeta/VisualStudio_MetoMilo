@@ -104,13 +104,13 @@ rw <- terra::crop(r, shp_water, mask=T, touches=F)
 rw <- terra::mask(rw, shp_5109_02_03, touches=F)
 
 
-rw_shp <- terra::as.polygons(rw, aggregate=F) %>%
+rw_shp_Hard <- terra::as.polygons(rw, aggregate=F) %>%
   sf::st_as_sf()
 
 # rw <- sf::st_intersection(grid_shp, shp_water)
 p2 <- ggplot() +
   geom_sf(data=shp_water, colour=NA, fill="lightblue", alpha=0.5) + 
-  geom_sf(data=rw_shp, colour="grey", fill="blue", alpha=0.1) + 
+  geom_sf(data=rw_shp_Hard, colour="grey", fill="blue", alpha=0.1) + 
   geom_sf(data=shp_5109_02_03, colour="red", fill=NA) + 
   theme_minimal() + 
   coord_sf(xlim=c(x0,x1), ylim=c(y0,y1), datum=25833)
@@ -126,18 +126,11 @@ ggsave(p2, file=paste0(folder_output_od, "/plot_Hard_raster1000.png"), width=10,
 
 #The masked water raster has the same number of cells as the original raster. The masked-out cells are given an NA value.
 
-#We can see the difference by taking the cell values from the unmasked and masked rasters and then comparing the total number of values with the number of non-NA values
+ # Save the results as .rds files
+  saveRDS(shp_5109_02_03, file = paste0(folder_output_od, "shp_5109_1000.rds"))
+  saveRDS(shp_water, file = paste0(folder_output_od, "shp_water.rds"))
+  saveRDS(rw_shp_Hard, file = paste0(folder_output_od, "rw_shp_Hard.rds"))
 
-values_r <- values(r)
-length(values_r)
-## [1] 8330
-length(values_r[!is.na(values_r)])
-## [1] 8330
-values_rw <- values(rw)
-length(values_rw)
-## [1] 8330
-length(values_rw[!is.na(values_rw)])
-## [1] 3182
 
 #Now we can use the unmasked raster r as a template for rasterising vector data and use the masked raster rw to mask the resulting rasters so that only water cells are “active”.
 

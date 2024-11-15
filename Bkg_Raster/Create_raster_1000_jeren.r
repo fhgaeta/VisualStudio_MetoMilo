@@ -1,11 +1,9 @@
-
 library(sf)
 library(dplyr)
 library(ggplot2)
 library(terra)
 
 Sys.setlocale("LC_ALL", "en_US.UTF-8")
-
 
 # Specify the path to the file for study area polygons (this file includes all study areas)
 basefolder_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/"
@@ -104,7 +102,7 @@ rw <- terra::crop(r, shp_water, mask=T, touches=F)
 rw <- terra::mask(rw, shp_5104, touches=F)
 
 
-rw_shp <- terra::as.polygons(rw, aggregate=F) %>%
+rw_shp_jer <- terra::as.polygons(rw, aggregate=F) %>%
   sf::st_as_sf()
 
 # rw <- sf::st_intersection(grid_shp, shp_water)
@@ -122,5 +120,10 @@ folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output"
 
 # Save the plot to the specified folder
 ggsave(p2, file=paste0(folder_output_od, "/plot_Jeren_raster1000.png"), width=10, height=10, units="cm", dpi=300)
+
+# Save the results as .rds files
+saveRDS(shp_5104, file = paste0(folder_output_od, "shp_5104_1000.rds"))
+saveRDS(shp_water, file = paste0(folder_output_od, "shp_water.rds"))
+saveRDS(rw_shp_jer, file = paste0(folder_output_od, "rw_shp_jer.rds"))
 
 #Now that we have defined our raster grid, we can convert vector data to the grid so that it can be used in our analyses.

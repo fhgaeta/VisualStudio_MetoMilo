@@ -123,4 +123,10 @@ folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output"
 # Save the plot to the specified folder
 ggsave(p2, file=paste0(folder_output_od, "/plot_Jeren_raster100.png"), width=10, height=10, units="cm", dpi=300)
 
+ # Save the results as .rds files
+  saveRDS(shp_5104, file = paste0(folder_output_od, "shp_5104_100.rds"))
+  saveRDS(shp_water, file = paste0(folder_output_od, "shp_water.rds"))
+  saveRDS(rw_shp, file = paste0(folder_output_od, "rw_shp.rds"))
+
+
 #Now that we have defined our raster grid, we can convert vector data to the grid so that it can be used in our analyses.

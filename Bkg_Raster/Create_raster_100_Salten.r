@@ -141,18 +141,11 @@ folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output"
 # Save the plot to the specified folder
 ggsave(p2, file=paste0(folder_output_od, "/plot_salten_raster100.png"), width=10, height=10, units="cm", dpi=300)
 
-#We can see the difference by taking the cell values from the unmasked and masked rasters and then comparing the total number of values with the number of non-NA values
+ # Save the results as .rds files
+  saveRDS(shp_1108, file = paste0(folder_output_od, "shp_1108_100.rds"))
+  saveRDS(shp_water, file = paste0(folder_output_od, "shp_water.rds"))
+  saveRDS(rw_shp, file = paste0(folder_output_od, "rw_shp.rds"))
 
-values_r <- values(r)
-length(values_r)
-## [1] 8330
-length(values_r[!is.na(values_r)])
-## [1] 8330
-values_rw <- values(rw)
-length(values_rw)
-## [1] 8330
-length(values_rw[!is.na(values_rw)])
-## [1] 3182
 
 #Now we can use the unmasked raster r as a template for rasterising vector data and use the masked raster rw to mask the resulting rasters so that only water cells are “active”.
 
