@@ -120,13 +120,13 @@ rw <- terra::crop(r, shp_water, mask=T, touches=F)
 rw <- terra::mask(rw, shp_1108, touches=F)
 
 
-rw_shp <- terra::as.polygons(rw, aggregate=F) %>%
+rw_shp_salten <- terra::as.polygons(rw, aggregate=F) %>%
   sf::st_as_sf()
 
 # rw <- sf::st_intersection(grid_shp, shp_water)
 p2 <- ggplot() +
   geom_sf(data=shp_water, colour=NA, fill="lightblue", alpha=0.5) + 
-  geom_sf(data=rw_shp, colour="grey", fill="blue", alpha=0.1) + 
+  geom_sf(data=rw_shp_salten, colour="grey", fill="blue", alpha=0.1) + 
   geom_sf(data=shp_1108, colour="red", fill=NA) + 
   theme_minimal() + 
   coord_sf(xlim=c(x0,x1), ylim=c(y0,y1), datum=25833)
@@ -145,7 +145,7 @@ ggsave(p2, file=paste0(folder_output_od, "/plot_salten_raster1000.png"), width=1
  # Save the results as .rds files
   saveRDS(shp_1108, file = paste0(folder_output_od, "shp_1108_1000.rds"))
   saveRDS(shp_water, file = paste0(folder_output_od, "shp_water.rds"))
-  saveRDS(rw_shp, file = paste0(folder_output_od, "rw_shp.rds"))
+  saveRDS(rw_shp_salten, file = paste0(folder_output_od, "rw_shp_Salten.rds"))
 
 
 #Now we can use the unmasked raster r as a template for rasterising vector data and use the masked raster rw to mask the resulting rasters so that only water cells are “active”.
