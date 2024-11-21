@@ -108,7 +108,7 @@ rw_shp_jer <- terra::as.polygons(rw, aggregate=F) %>%
 # rw <- sf::st_intersection(grid_shp, shp_water)
 p2 <- ggplot() +
   geom_sf(data=shp_water, colour=NA, fill="lightblue", alpha=0.5) + 
-  geom_sf(data=rw_shp, colour="grey", fill="blue", alpha=0.1) + 
+  geom_sf(data=rw_shp_jer, colour="grey", fill="blue", alpha=0.1) + 
   geom_sf(data=shp_5104, colour="red", fill=NA) + 
   theme_minimal() + 
   coord_sf(xlim=c(x0,x1), ylim=c(y0,y1), datum=25833)
