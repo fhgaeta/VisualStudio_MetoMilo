@@ -24,7 +24,6 @@ folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output"
 # read and plot spawnings grounds for torsk
 
 base_path <- paste0("C:/Users/", user, "/NIVA/METOMI~1/AP1KAR~1/DATACO~1/GISDAT~1/ECOLOG~1/12. Fisk/12.1 Spawning grounds/kysttorsk/")
-#shp_salt_torsk <- read_sf(paste0(base_path, "kysttorsk.shp"))
 shp_lyr_Hard <- read_sf(paste0(base_path, "../Gytefelt_lyr/Gytefelt_lyr.shp"))
 shp_hard_hvitting <- read_sf(paste0(base_path, "../Gytefelt_hvitting/Gytefelt_hvitting.shp"))
 shp_hard_hyse <- read_sf(paste0(base_path, "../Gytefelt_hyse/Gytefelt_hyse.shp"))
@@ -40,8 +39,8 @@ ggplot() +
   geom_sf(data = shp_hard_hvitting, fill = "green", color = "white") +
   geom_sf(data = shp_hard_hyse, fill = "#ac5564", color = "white") +
   geom_sf(data = shp_hard_sei, fill = "blue", color = "white") +
-  labs(title = "Spawning Grounds for Hyse, Lyr, Sei, and Hvitting in Hardanger") +
-  theme_void()
+  labs(title = "Shapefile of Spawning grounds for torsk, hyse, lyr, sei, hvitting") +
+  theme_void()  
 
 #Load study area polygons
 Study_areas <- read_sf(paste0(sub_dir, "Focus areas_boundary.shp"))
@@ -54,7 +53,7 @@ Study_areas_proj <- Study_areas %>%
   sf::st_transform(crs=crs_proj)
 shp_water_proj <- shp_water %>%
   sf::st_transform(crs=crs_proj)
-shp_hard_lyr_proj <- shp_hard_lyr %>%
+shp_hard_lyr_proj <- shp_lyr_Hard %>%
   sf::st_transform(crs=crs_proj)
 shp_hard_hvitting_proj <- shp_hard_hvitting %>%
   sf::st_transform(crs=crs_proj)
@@ -68,7 +67,7 @@ selected_region <- Study_areas_proj %>%
   filter(vannregion == "5109")
 
   # Intersect the low oxygen fjords with the selected study area
-  shp_hard_lyr_intersect <- sf::st_intersection(shp_lyr_hard_proj, selected_region)
+  shp_hard_lyr_intersect <- sf::st_intersection(shp_hard_lyr_proj, selected_region)
   shp_hard_hvitting_intersect <- sf::st_intersection(shp_hard_hvitting_proj, selected_region)
   shp_hard_hyse_intersect <- sf::st_intersection(shp_hard_hyse_proj, selected_region)
   shp_hard_sei_intersect <- sf::st_intersection(shp_hard_sei_proj, selected_region)
@@ -90,7 +89,7 @@ plot_title <- paste0("Vannregion: ", selected_region$vannregion[2])
 #plot the results
 p <- ggplot() +
   geom_sf(data=selected_region, fill=NA, colour="grey", alpha=0.2, linewidth=0.4) +
-  geom_sf(data=shp_5104, fill="lightblue", colour=NA, alpha=0.8) +
+  geom_sf(data=shp_5109, fill="lightblue", colour=NA, alpha=0.8) +
   geom_sf(data = shp_hard_lyr_intersect, fill = "#69b3a2", color = "white") +
   geom_sf(data = shp_hard_hvitting_intersect, fill = "green", color = "white") +
   geom_sf(data = shp_hard_hyse_intersect, fill = "#ac5564", color = "white") +
@@ -101,7 +100,7 @@ p <- ggplot() +
   theme_minimal() +
   labs(subtitle= plot_title)
 
-p
+print(p)
 
 # Define the folder path
 folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output/12. fisk/12.1 Spawning grounds/"
@@ -137,48 +136,50 @@ plot (r)
 
 
 # Rasterize the intersected shapefile
-r_hard_spawning <- terra::rasterize(shp_hard_lyr_intersect, r, field=1, fun="mean")
+r_hard_lyr <- terra::rasterize(shp_hard_lyr_intersect, r, field=1, fun="mean")  
+r_hard_hvitting <- terra::rasterize(shp_hard_hvitting_intersect, r, field=2, fun="mean")
+r_hard_hyse <- terra::rasterize(shp_hard_hyse_intersect, r, field=3, fun="mean")
+r_hard_sei <- terra::rasterize(shp_hard_sei_intersect, r, field=4, fun="mean")
 
 # Convert the rasterized data to polygons for visualization
 #rasterized_salt_low_shp <- as.data.frame(r_salt_low, xy = TRUE)
-rasterized_hard_lyr_shp <- terra::as.polygons(r_hard_spawning, aggregate = TRUE)
+rasterized_hard_lyr_shp <- terra::as.polygons(r_hard_lyr, aggregate = TRUE)
+rasterized_hard_hvitting_shp <- terra::as.polygons(r_hard_hvitting, aggregate = TRUE) 
+rasterized_hard_hyse_shp <- terra::as.polygons(r_hard_hyse, aggregate = TRUE)
+rasterized_hard_sei_shp <- terra::as.polygons(r_hard_sei, aggregate = TRUE)
 
 # Ensure the object is an sf object
 rasterized_hard_lyr_shp <- st_as_sf(rasterized_hard_lyr_shp)
+rasterized_hard_hvitting_shp <- st_as_sf(rasterized_hard_hvitting_shp)
+rasterized_hard_hyse_shp <- st_as_sf(rasterized_hard_hyse_shp)
+rasterized_hard_sei_shp <- st_as_sf(rasterized_hard_sei_shp)
 
 # Check if the geometry column is present
 print(names(rasterized_hard_lyr_shp))
+print(names(rasterized_hard_hvitting_shp))
+print(names(rasterized_hard_hyse_shp))
+print(names(rasterized_hard_sei_shp))
 
-ggplot(rasterized_hard_lyr_shp) +
-  geom_raster(aes(x = x, y = y, fill = layer)) +
-  scale_fill_viridis_c() +
-  theme_minimal() +
-  labs(title = "Rasterized spawnings areas", fill = "Value")
-
-# Ensure the geometry column is correctly recognized
-if (!"geometry" %in% names(rasterized_hard_lyr_shp)) {
-  rasterized_hard_lyr_shp <- st_as_sf(rasterized_hard_lyr_shp)
-}
-
-# Create the plot
-p2 <- ggplot() +
-  geom_sf(data = rasterized_hard_lyr_shp, aes(geometry = geometry), colour = NA, alpha = 0.8, fill = "yellow") +  # Add the rasterized shapefile
-  geom_sf(data = shp_water, colour = NA, fill = "lightblue", alpha = 0.5) + 
-  geom_sf(data = rw_shp_Hard, colour = "grey", fill = NA, alpha = 0.1) +
-  geom_sf(data = shp_5109, colour = "red", fill = NA) + 
-  theme_minimal() + 
-  coord_sf(xlim = c(x0, x1), ylim = c(y0, y1), datum = 25833) +
-  scale_fill_discrete(name = "Fjords with spawnings area lyr") +
-  labs(title = "Merged Plot of Rasterized spawnings area lyr")
+  # Create the plot with color differentiation for different fish spawning categories
+  p2 <- ggplot() +
+    geom_sf(data = rasterized_hard_lyr_shp, fill = "#69b3a2", color = "white", alpha = 0.8) +
+    geom_sf(data = rasterized_hard_hvitting_shp, fill = "green", color = "white", alpha = 0.8) +
+    geom_sf(data = rasterized_hard_hyse_shp, fill = "#ac5564", color = "white", alpha = 0.8) +
+    geom_sf(data = rasterized_hard_sei_shp, fill = "blue", color = "white", alpha = 0.8) +
+    geom_sf(data = shp_water, colour = NA, fill = "lightblue", alpha = 0.5) + 
+    geom_sf(data = rw_shp_Hard, colour = "grey", fill = NA, alpha = 0.1) +
+    geom_sf(data = shp_5109, colour = "red", fill = NA) + 
+    coord_sf(xlim = c(x0, x1), ylim = c(y0, y1), crs = crs_proj) +
+    labs(title = "Rasterized spawnings areas", fill = "Value") +
+    theme_minimal()
 
 # Display the plot
 print(p2)
-
 
 
 # Define the folder path
 folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output/12. Fisk/12.1 Spawning grounds/"
 
 # Save the raster plot
-ggsave(p2, filename=paste0(folder_output_od, "Spawnings_area_lyr_Hardangervidda_1000", selected_region$vannregion[3], ".png"),
+ggsave(p2, filename=paste0(folder_output_od, "Spawnings_area_Hardangervidda_1000_raster", selected_region$vannregion[3], ".png"),
        dpi=300, height=20, width=20, units="cm", bg="white")
