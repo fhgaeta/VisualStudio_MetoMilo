@@ -7,7 +7,6 @@ library(ggplot2)
 library(terra)
 
 #Define folder
-
 user<-Sys.getenv ("USERNAME")
 
 basefolder <- paste0("C:/Users/",user,"/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe - METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/Data collection/GIS Data/")
@@ -74,7 +73,7 @@ print(p)
 folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output/12. fisk/12.2 feeding areas/"
 
 # Save the vectorial plot
-ggsave(p, filename=paste0(folder_output_od, "Feeding area_salt_vectorial", selected_region$vannregion[2], ".png"),
+ggsave(p, filename=paste0(folder_output_od, "Feeding area_salt_vectorial", selected_region$vannregion[1], ".png"),
        dpi=300, height=20, width=20, units="cm", bg="white")
 
 #Define the extent (Box)
