@@ -6,8 +6,6 @@ library(sf)
 library(ggplot2)
 library(leaflet)
 library(terra)
-#install.packages("rgdal")
-#library(rgdal)
 
 #Define folder
 Sys.setlocale("LC_ALL", "en_US.UTF-8")
