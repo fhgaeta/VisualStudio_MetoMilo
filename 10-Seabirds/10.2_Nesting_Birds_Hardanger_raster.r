@@ -17,13 +17,24 @@ Sys.setlocale("LC_ALL", "en_US.UTF-8")
 
 basefolder_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/"
 basefolder_teams <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe - METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/Data collection/"
-folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output"
+folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output/"
 
   # Load the saved .rds files
-  shp_5109_02_03 <- readRDS(paste0(folder_output_od, "shp_5109_1000.rds"))
+  # This is a 1.000m grid for the study area
+  # shp_5109_02_03 <- readRDS(paste0(folder_output_od, "shp_5109_1000.rds"))
   shp_water <- readRDS(paste0(folder_output_od, "shp_water.rds"))
   rw_shp <- readRDS(paste0(folder_output_od, "rw_shp.rds"))
 
+# load the 100m study area mask as a shapefile
+shp_100_hardang <- sf::read_sf(paste0(basefolder_od,"Focus areas/grid_mask/Hardanger_5109_03/Hardanger_5109_03_mask_adj.shp"),
+quiet = T)
+
+p <- ggplot(shp_100_hardang) +
+  geom_sf(fill = "#040404b7", color = "white") +
+  theme_void()
+
+ggsave(p, filename=paste0(folder_output_od, "shp_100_hardang.png"),
+       dpi=300, height=20, width=20, units="cm", bg="white")
 
 # read bird data 
 
@@ -36,6 +47,20 @@ shp_birds_all <- purrr::map(db_layers, sf::st_read, dsn=file, quiet=T) %>%
   bind_rows()
 
 shp_birds <- shp_birds_all %>%
+  sf::st_transform(crs=crs_proj)
+
+  #Load study area polygons
+Study_areas <- read_sf(paste0(sub_dir, "Focus areas_boundary.shp"))
+
+# get the projection from the geonorge layer - we will use this as the basis for our work
+crs_proj <- sf::st_crs(shp_water)
+
+#The polygons are defined in lat/long coordinates. Now we want to transform them to UTM33 projected coordinates.
+Study_areas_proj <- Study_areas %>%
+  sf::st_transform(crs=crs_proj)
+shp_hard_low_proj <- shp_hard_low %>%
+  sf::st_transform(crs=crs_proj)
+shp_water_proj <- shp_water %>%
   sf::st_transform(crs=crs_proj)
 
 # intersection of birds and area polygons will 

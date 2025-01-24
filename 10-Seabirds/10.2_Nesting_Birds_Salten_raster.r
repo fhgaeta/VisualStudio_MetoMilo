@@ -20,9 +20,22 @@ basefolder_teams <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Pr
 folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output"
 
   # Load the saved .rds files
-  shp_1108 <- readRDS(paste0(folder_output_od, "shp_1108_1000.rds"))
+ # shp_1108 <- readRDS(paste0(folder_output_od, "shp_1108_1000.rds"))
   shp_water <- readRDS(paste0(folder_output_od, "shp_water.rds"))
   rw_shp <- readRDS(paste0(folder_output_od, "rw_shp.rds"))
+
+# load the 100m study area mask as a shapefile
+shp_300_salten <- sf::read_sf(paste0(basefolder_od,"Focus areas/grid_mask/Jæren_5104_01/Jæren_5104_01_mask_adj.shp"),
+quiet = T)
+
+p <- ggplot(shp_300_salten) +
+  geom_sf(fill = "#040404b7", color = "white") +
+  theme_void()
+
+ggsave(p, filename=paste0(folder_output_od, "shp_100_jeren_v2.png"),
+       dpi=300, height=20, width=20, units="cm", bg="white")
+
+
 
 # read bird data 
 
