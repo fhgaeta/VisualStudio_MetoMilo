@@ -142,7 +142,7 @@ rasterise_mm <- function(rmask,
       mutate(value=ifelse(is.na(value),0,value))
     
     if(!is.na(filecsv)){
-      foldercsv <- basename(filecsv)
+      foldercsv <- dirname(filecsv)
       if(!dir.exists(foldercsv)){
         dir.create(foldercsv)
       }
