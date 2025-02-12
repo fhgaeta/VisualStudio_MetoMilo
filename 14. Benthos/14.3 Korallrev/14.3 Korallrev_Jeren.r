@@ -1,5 +1,5 @@
-#plot single area - Salten 14.3 Korallrev
-
+#plot single area - Jæren 14.3 Korallrev
+#working on it
 
 #16. Naturtyper. DN-Handbok 19
 #18 Extremely valuable and sensitive areas 
@@ -25,19 +25,18 @@ sub_teams <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektg
 sub_dir <- paste0("C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe - METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/Data collection/Focus areas/")
 folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output"
 
-# Define the path to the GDB file  DN-19 Salten
-file_path_gdb <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/16. Naturtyper. DN-Håndbok 19/16.1 Nord Salten DN Nat.19/Naturtyper_hb19_EgnDef_4326_FILEGDB.gdb"
+# Define the path to the GDB file  DN-19 Jeren
+file_path_gdb <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/16. Naturtyper. DN-Håndbok 19/16.1 Rogaland Naturtyper_hb19_11_FILEGDB/Naturtyper_hb19_11_rogaland_25832_FILEGDB.gdb"
 
-#read shp file DN-19 Salten
-gdb_dn19 <- read_sf(file_path_gdb)
+#read shp file DN-19 Jeren
+gdb_dn19_jeren <- read_sf(file_path_gdb)
 
 # Define the path to the SHP file- 18 Extremely valuable and sensitive areas 
 file_path_gdb_ext_val <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/18. Extremely valuable and sensitive areas/svo_miljoverdier_korallrev/svo_miljoverdier_korallrev.shp"
 
 #read shp file 18 Extremely valuable and sensitive areas
-gdb_ext_val <- read_sf(file_path_gdb_ext_val) 
-# Define the CRS (Coordinate Reference System)
-crs_proj <- st_crs(25833)  # UTM zone 33N
+gdb_ext_val <- read_sf(file_path_gdb_ext_val) %>%
+  sf::st_set_crs(crs_proj)
 
 # Define the path to 19 Sårbare marine biotoper
 file_path_gdb_sar_mar_bio <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/19. Sårbare marine biotoper/19.2 SarbareMarineBunndyrObs_FGDB/SarbareMarineBunndyrObs_FGDB.gdb"
@@ -58,19 +57,15 @@ file_path_gdb_spe_hab <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Dat
 #read shp file 22. Species/habitats & areas of conservation
 gdb_spe_hab <- read_sf(file_path_gdb_spe_hab)
 
-  # Load the saved .rds files
-  shp_1108 <- readRDS(paste0(folder_output_od, "shp_1108_1000.rds"))
+  shp_5104 <- readRDS(paste0(folder_output_od, "shp_5104_1000.rds"))
   shp_water <- readRDS(paste0(folder_output_od, "shp_water.rds"))
   rw_shp <- readRDS(paste0(folder_output_od, "rw_shp.rds"))
 
-# load the 200m study area mask as a shapefile in raster format
-rast_200_salt <- terra::rast(paste0(basefolder_od,"Focus areas/grid_mask/Raster/Nord-Salten_1108_08.tif"))
+# load the 100m study area mask as a shapefile in raster format
+rast_100_jeren <- terra::rast(paste0(basefolder_od,"Focus areas/grid_mask/Raster/Jæren_5104_01.tif"))
 
 # get the projection from the geonorge layer - we will use this as the basis for our work
 crs_proj <- sf::st_crs(shp_water)
-
-gdb_ext_val <- read_sf(file_path_gdb_ext_val) %>% 
-  sf::st_set_crs(crs_proj)
 
 #Load study area polygons
 Study_areas <- read_sf(paste0(sub_dir, "Focus areas_boundary.shp"))
@@ -81,7 +76,7 @@ Study_areas_proj <- Study_areas %>%
   sf::st_transform(crs=crs_proj)
 shp_cor_reef_proj <- gdb_cor_reef %>%
   sf::st_transform(crs=crs_proj)
-shp_dn19_proj <- gdb_dn19 %>%
+shp_dn19_proj <- gdb_dn19_jeren %>%
   sf::st_transform(crs=crs_proj)
 shp_ext_val_proj <- gdb_ext_val %>%
   sf::st_transform(crs = crs_proj)
@@ -97,7 +92,7 @@ shp_water_proj <- shp_water %>%
 
 # Subarea of study area
 shp_area_2 <- Study_areas_proj %>%
-  filter(vannregion=="1108")
+  filter(vannregion=="5104")
 
 # intersection of datasett and area polygons will give us points within the study areas
 shp_cor_reef_inters <- sf::st_intersection(
@@ -129,7 +124,7 @@ shp_spe_hab_inters <- sf::st_intersection(
 
 #plot the results
 p1 <-ggplot() +
-  geom_sf(data = shp_1108, fill = "#69d9f5", colour = NA, alpha = 0.2) +
+  geom_sf(data = shp_5104, fill = "#69d9f5", colour = NA, alpha = 0.2) +
   geom_sf(data = shp_cor_reef_inters, aes(colour = naturtypenavn )) +
   geom_sf(data = shp_area_2, fill = NA, colour = "grey", alpha = 0.2, linewidth = 0.4) +
  geom_sf(data= shp_dn19_inters, aes(colour = naturtype)) +
@@ -142,7 +137,7 @@ p1 <-ggplot() +
   guides(colour = guide_legend(ncol = 1, byrow = TRUE, override.aes = list(size = 4))) +
   theme_minimal() +
   theme(legend.position = "right", legend.text = element_text(size = 8)) +
-  labs(subtitle = "14.3 Korallrev - Salten")
+  labs(subtitle = "14.3 Korallrev - Jæren")
 
 
 # get the region
@@ -152,12 +147,12 @@ plot_title <- paste0("Vannregion: ", shp_area_2$vannregion[1])
 folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output/14. Benthos/"
 
 # Save the vectorial plot for the current study area
-ggsave(p1, filename = paste0(folder_output_od, "14.3 Korallrev_Salten_vectorial_", shp_area_2$vannregion[1], ".png"),
+ggsave(p1, filename = paste0(folder_output_od, "14.3 Korallrev_Jæren_vectorial_", shp_area_2$vannregion[1], ".png"),
              dpi = 300, height = 20, width = 20, units = "cm", bg = "white")
 
 # Transform the data to raster format
 
-#16. Naturtyper. DN-Handbok 19 - NO korallforekomster
+#16. Naturtyper. DN-Handbok 19 - NO AREAS
 # List of species to rasterize
 species_list <- shp_dn19_inters %>%
   filter(naturtype %in% c("korallforekomster")) %>% 
@@ -175,7 +170,7 @@ for (species_to_rasterize in species_list) {
 
   # Rasterize the filtered data
   rasterized_species <- terra::rasterize(
-    shp_dn19_inters_selection, rast_200_salt, field = "naturtype", fun = "count"
+    shp_dn19_inters_selection, rast_100_jeren, field = "naturtype", fun = "count"
   )
 # Convert the rasterized data to polygons for visualization
   df <- terra::xyFromCell(rasterized_species, 1:ncell(rasterized_species)) %>% as.data.frame()
@@ -190,11 +185,11 @@ for (species_to_rasterize in species_list) {
   # Create a ggplot object
   plot <- ggplot() +
     geom_sf(data = rasterized_species_shp, colour = NA, alpha = 0.8) +
-    ggtitle(paste("14.3 Korallrev_Salten_naturtype", species_to_rasterize)) +
+    ggtitle(paste("14.3 Korallrev_Jeren_naturtype", species_to_rasterize)) +
     theme_minimal() +
     geom_sf(data = shp_water, colour = NA, fill = "lightblue", alpha = 0.5) +
     coord_sf(xlim = st_bbox(shp_area_2)[c("xmin", "xmax")], ylim = st_bbox(shp_area_2)[c("ymin", "ymax")], datum = 25833) +
-    scale_fill_discrete(name = "14.3 Korallrev_Salten_naturtype_Steinkoraller") +
+    scale_fill_discrete(name = "14.3 Korallrev_Jeren_naturtype_Steinkoraller") +
     geom_point(data = df, aes(x = x, y = y), color = "red")
 
   # Define the folder path
@@ -205,7 +200,7 @@ for (species_to_rasterize in species_list) {
     plot,
     filename = paste0(
       folder_output_od, 
-      "14.3 Korallrev_Salten_naturtype_Steinkoraller_raster_100_", 
+      "14.3 Korallrev_Jæren_naturtype_Steinkoraller_raster_100_", 
       species_to_rasterize, 
       ".png"
     ),
@@ -214,7 +209,7 @@ for (species_to_rasterize in species_list) {
 }
 
 # 18. Extremely valuable and sensitive areas - NO AREAS
-# 20 korallrev -
+# 20 korallrev - NO AREAS
 # List of species to rasterize
 species_list <- shp_cor_reef_inters %>% 
   filter(naturtypenavn %in% c("korallforekomster")) %>% 
@@ -232,7 +227,7 @@ for (species_to_rasterize in species_list) {
 
   # Rasterize the filtered data
   rasterized_species <- terra::rasterize(
-    shp_cor_reef_inters_selection, rast_200_salt, field = "naturtypenavn", fun = "count"
+    shp_cor_reef_inters_selection, rast_100_jeren, field = "naturtypenavn", fun = "count"
   )
 # Convert the rasterized data to polygons for visualization
   df <- terra::xyFromCell(rasterized_species, 1:ncell(rasterized_species)) %>% as.data.frame()
@@ -247,11 +242,11 @@ for (species_to_rasterize in species_list) {
   # Create a ggplot object
   plot <- ggplot() +
     geom_sf(data = rasterized_species_shp, colour = NA, alpha = 0.8) +
-    ggtitle(paste("14.3 Korallrev_Salten_naturtypenavn", species_to_rasterize)) +
+    ggtitle(paste("14.3 Korallrev_Jeren_naturtypenavn", species_to_rasterize)) +
     theme_minimal() +
     geom_sf(data = shp_water, colour = NA, fill = "lightblue", alpha = 0.5) +
     coord_sf(xlim = st_bbox(shp_area_2)[c("xmin", "xmax")], ylim = st_bbox(shp_area_2)[c("ymin", "ymax")], datum = 25833) +
-    scale_fill_discrete(name = "14.3 Korallrev_Salten_naturtypenavn") +
+    scale_fill_discrete(name = "14.3 Korallrev_Jeren_naturtypenavn") +
     geom_point(data = df, aes(x = x, y = y), color = "red")
 
   # Define the folder path
@@ -262,7 +257,7 @@ for (species_to_rasterize in species_list) {
     plot,
     filename = paste0(
       folder_output_od, 
-      "14.3 Korallrev_Salten_naturtype_naturtypenavn_raster_100_", 
+      "14.3 Korallrev_Jæren_naturtype_naturtypenavn_raster_100_", 
       species_to_rasterize, 
       ".png"
     ),
@@ -303,11 +298,11 @@ for (species_to_rasterize in species_list) {
   # Create a ggplot object
   plot <- ggplot() +
     geom_sf(data = rasterized_species_shp, colour = NA, alpha = 0.8) +
-    ggtitle(paste("14.3 Sårbare habitater_Salten_", species_to_rasterize)) +
+    ggtitle(paste("14.3 Sårbare habitater_Jeren_", species_to_rasterize)) +
     theme_minimal() +
     geom_sf(data = shp_water, colour = NA, fill = "lightblue", alpha = 0.5) +
     coord_sf(xlim = st_bbox(shp_area_2)[c("xmin", "xmax")], ylim = st_bbox(shp_area_2)[c("ymin", "ymax")], datum = 25833) +
-    scale_fill_discrete(name = "14.3 Korallrev_Salten_naturtypenavn") +
+    scale_fill_discrete(name = "14.3 Korallrev_Jeren_naturtypenavn") +
     geom_point(data = df, aes(x = x, y = y), color = "red")
 
   # Define the folder path
@@ -318,7 +313,7 @@ for (species_to_rasterize in species_list) {
     plot,
     filename = paste0(
       folder_output_od, 
-      "14.3 Sårbare habitater_Salten_raster_100_", 
+      "14.3 Sårbare habitater_Jeren_raster_100_", 
       species_to_rasterize, 
       ".png"
     ),

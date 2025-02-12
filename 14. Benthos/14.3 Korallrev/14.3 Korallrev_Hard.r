@@ -35,7 +35,8 @@ gdb_dn19_hard <- read_sf(file_path_gdb)
 file_path_gdb_ext_val <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/18. Extremely valuable and sensitive areas/svo_miljoverdier_korallrev/svo_miljoverdier_korallrev.shp"
 
 #read shp file 18 Extremely valuable and sensitive areas
-gdb_ext_val <- read_sf(file_path_gdb_ext_val)
+gdb_ext_val <- read_sf(file_path_gdb_ext_val) %>%
+  sf::st_set_crs(crs_proj)
 
 # Define the path to 19 Sårbare marine biotoper
 file_path_gdb_sar_mar_bio <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/19. Sårbare marine biotoper/19.2 SarbareMarineBunndyrObs_FGDB/SarbareMarineBunndyrObs_FGDB.gdb"
@@ -78,8 +79,8 @@ shp_cor_reef_proj <- gdb_cor_reef %>%
   sf::st_transform(crs=crs_proj)
 shp_dn19_proj <- gdb_dn19_hard %>%
   sf::st_transform(crs=crs_proj)
-shp_ext_val_proj <- gdb_ext_val %>% 
-  sf::st_transform(crs=crs_proj)
+shp_ext_val_proj <- gdb_ext_val %>%
+  sf::st_transform(crs = crs_proj)
 shp_sar_mar_bio_proj <- gdb_sar_mar_bio %>%
   sf::st_transform(crs=crs_proj)
 shp_sar_hab_proj <- gdb_sar_hab %>%
@@ -206,3 +207,63 @@ for (species_to_rasterize in species_list) {
     dpi = 300, height = 20, width = 20, units = "cm", bg = "white"
   )
 }
+
+# 18. Extremely valuable and sensitive areas - NO AREAS
+# 20 korallrev
+# List of species to rasterize
+species_list <- shp_cor_reef_inters %>%
+  filter(naturtypenavn %in% c("korallforekomster")) %>%
+  distinct(naturtypenavn) %>%
+  pull(naturtypenavn) %>%
+  as.character()
+
+# Loop through each species
+for (species_to_rasterize in species_list) {
+ cat(paste0(species_to_rasterize, "\n")) 
+  
+  # Filter the shapefile for the current species "testspec"
+ shp_cor_reef_inters_selection <- shp_cor_reef_inters %>%
+    filter(naturtypenavn %in% c("korallforekomster"))
+
+  # Rasterize the filtered data
+  rasterized_species <- terra::rasterize(
+    shp_cor_reef_inters_selection, rast_100_hard, field = "naturtypenavn", fun = "count"
+  )
+# Convert the rasterized data to polygons for visualization
+  df <- terra::xyFromCell(rasterized_species, 1:ncell(rasterized_species)) %>% as.data.frame()
+  df$val <- terra::values(rasterized_species)
+  df <- df %>%
+    filter(!is.na(val))
+
+    # Convert the rasterized data to polygons for visualization
+  rasterized_species_shp <- terra::as.polygons(rasterized_species, aggregate = FALSE) %>%
+    sf::st_as_sf()
+
+  # Create a ggplot object
+  plot <- ggplot() +
+    geom_sf(data = rasterized_species_shp, colour = NA, alpha = 0.8) +
+    ggtitle(paste("14.3 Korallrev_Hardanger_naturtypenavn", species_to_rasterize)) +
+    theme_minimal() +
+    geom_sf(data = shp_water, colour = NA, fill = "lightblue", alpha = 0.5) +
+    coord_sf(xlim = st_bbox(shp_area_2)[c("xmin", "xmax")], ylim = st_bbox(shp_area_2)[c("ymin", "ymax")], datum = 25833) +
+    scale_fill_discrete(name = "14.3 Korallrev_Hardanger_naturtypenavn") +
+    geom_point(data = df, aes(x = x, y = y), color = "red")
+
+  # Define the folder path
+  folder_output_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/Output_final/"
+
+  # Save the raster
+  ggsave(
+    plot,
+    filename = paste0(
+      folder_output_od, 
+      "14.3 Korallrev_Hardanger_naturtype_naturtypenavn_raster_100_", 
+      species_to_rasterize, 
+      ".png"
+    ),
+    dpi = 300, height = 20, width = 20, units = "cm", bg = "white"
+  )
+}
+
+# 21 Marine grunnkart -Sårbare habitater - NO AREAS
+# 22. Species/habitats & areas of conservation - Overlapping areas with 20. Coral reefs
