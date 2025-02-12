@@ -7,7 +7,7 @@ library(ggplot2)
 library(leaflet)
 library(terra)
 
-
+# CJM made a comment
 
 #Define folder
 Sys.setlocale("LC_ALL", "en_US.UTF-8")
