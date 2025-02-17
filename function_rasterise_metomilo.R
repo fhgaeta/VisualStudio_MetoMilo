@@ -77,7 +77,7 @@ rasterise_mm <- function(rmask,
                          variable=NA_character_, 
                          filecsv=NA_character_, 
                          return_df=TRUE){
-  
+
   # ---- dataframe of x,y values from the area raster ----
   
   df_mask <- rmask %>%
@@ -107,6 +107,11 @@ rasterise_mm <- function(rmask,
       select(1)
     variable <- ""
   }
+  if(!is.numeric(shp[,1])){
+    # a non-numeric column was selected replace the values with 1
+    shp[,1] <- 1
+  }
+  
   
   # transform shp to same CRS as the area raster, r (UTM33)
   shp <- shp %>%
