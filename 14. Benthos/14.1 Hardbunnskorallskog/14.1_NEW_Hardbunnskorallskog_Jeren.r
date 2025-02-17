@@ -32,6 +32,7 @@ gdb_coral_garden <- read_sf(file_path_gdb_cor_gard)
 
 # --------- load the 100m study area raster ----
 r_area <- terra::rast(paste0(folder_area, "Jæren_5104_01.tif"))
+r_area <- terra::rast(paste0(basefolder_od, "/Focus areas/grid_mask/Raster/Jæren_5104_01.tif"))
 
 
 # ---------- read data layers ----------------
