@@ -1,10 +1,10 @@
-#plot single area - Hardanger 14.3 Korallrev
+#plot single area - Salten 14.3 Korallrev
 
-#16. Naturtyper. DN-Handbok 19
-#18 Extremely valuable and sensitive areas 
-#20. Coral reefs
-#21 Marine grunnkart -Sårbare habitater 
-#22. Species/habitats & areas of conservation
+#16. Naturtyper. DN-Handbok 19 -yes
+#18 Extremely valuable and sensitive areas - no
+#20. Coral reefs - yes
+#21 Marine grunnkart -Sårbare habitater - no 
+#22. Species/habitats & areas of conservation -no
 
 library(dplyr)
 library(sf)
@@ -49,9 +49,9 @@ file_path_gdb_spe_hab <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Dat
 # "Sunnhordaland_5109_02.tif"
 
 # Load the 100m study area raster
-r_area <- terra::rast(paste0(basefolder_od, "/Focus areas/grid_mask/Raster/5109_02_03.tif"))
+r_area <- terra::rast(paste0(basefolder_od, "/Focus areas/grid_mask/Raster/Nord-Salten_1108_08.tif"))
 
-#load DN-19 
+#load DN-19 - NO DATA IN SALTEN
 db_layers <- sf::st_layers(file_path_gdb)$name
 shp_dn_19 <- purrr::map(
   db_layers, sf::st_read, dsn = file_path_gdb, quiet = TRUE
@@ -73,7 +73,7 @@ for (i in seq_along(species_list)) {
   shp <- shp_dn_19 %>% filter(naturtype == species)
 
   # Define output CSV file name
-  file_out <- paste0(local_folder, "14.3_", species, "_Hardanger", ".csv")
+  file_out <- paste0(local_folder, "14.3_", species, "_Salten", ".csv")
 
   # Rasterize and save CSV
   df <- rasterise_mm(r_area, shp, variable = "naturtype", return_df = TRUE, filecsv = file_out)
@@ -105,7 +105,7 @@ for (i in seq_along(species_list)) {
   shp <- shp_cor_reef %>% filter(naturtypenavn == species_list)
 
   # Define output CSV file name
-  file_out <- paste0(local_folder, "14.3_", species, "_Hardanger", ".csv")
+  file_out <- paste0(local_folder, "14.3_", species, "_Salten", ".csv")
 
   # Rasterize and save CSV
   df <- rasterise_mm(r_area, shp, variable = "naturtypenavn", return_df = TRUE, filecsv = file_out)
@@ -114,3 +114,4 @@ for (i in seq_along(species_list)) {
   # Save the data to a CSV file
   write.csv(df, file_out)
 }
+
