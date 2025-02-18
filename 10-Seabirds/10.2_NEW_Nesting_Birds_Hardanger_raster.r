@@ -13,6 +13,7 @@ folder_base <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjek
 
 folder_area <- paste0(folder_base,"Focus areas/grid_v3/raster/")
 folder_output_csv <- paste0(folder_base, "../Analyses/input_data/ecosystem_components/")
+local_folder <- paste0("C:/Users/FEG/Downloads/TEST_Metomilo_Local/")
 db_path <- paste0(folder_base,"GIS Data/Ecological components data/10. Seabirds/10.2_FGDB.gdb")
 
 # study area raster files
@@ -52,7 +53,7 @@ shp <- sf::st_read(layer, dsn=db_path, quiet=T)
 
 df <-  rasterise_mm(r_area, shp, variable = "estimatedvalue")
 
-file_out <- paste0(folder_output_csv, layer, ".csv")
+file_out <- paste0(folder_output_csv, "10.2_", layer, "_Hardanger", ".csv")
 
 rasterise_mm(r_area, shp, variable = "estimatedvalue", 
              return_df = FALSE, filecsv = file_out)
@@ -68,26 +69,28 @@ write.csv(df, file_out)
 # you can just run the whole for{} loop here
 
 
-for(i in seq_along(db_layers)){
+
+for (i in seq_along(db_layers)) {
 
   # select current layer
   layer <- db_layers[i]
-  cat(paste0(layer,": "))
+  cat(paste0(layer, ": "))
 
   # load shape for selected layer
-  shp <- sf::st_read(layer, dsn=db_path, quiet=T)
+  shp <- sf::st_read(layer, dsn = db_path, quiet = TRUE)
 
   # define output csv file name
- file_out <- paste0(folder_output_csv, layer, ".csv")
+  file_out <- paste0(local_folder, "10.2_", layer, "_Hardanger", ".csv")
 
   # rasterise and save csv
-  n <- rasterise_mm(r_area, shp, variable = "estimatedvalue", 
-               return_df = FALSE, filecsv = file_out)
-  cat(paste0(n,"\n"))
+  df <- rasterise_mm(r_area, shp, variable = "estimatedvalue",
+                     return_df = TRUE, filecsv = file_out)
 
-# save the data to a csv file
-# define the path to the output folder
+  cat(paste0(nrow(df), "\n"))
 
-write.csv(df, file_out)
+  # save the data to a csv file
+  # define the path to the output folder
+
+  write.csv(df, file_out)
 
 }
