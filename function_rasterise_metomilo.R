@@ -107,11 +107,14 @@ rasterise_mm <- function(rmask,
       select(1)
     variable <- ""
   }
-  if(!is.numeric(shp[,1])){
+  
+  shp_vals <- shp %>% 
+    sf::st_drop_geometry()
+  
+  if(!is.numeric(shp_vals[,1])){
     # a non-numeric column was selected replace the values with 1
     shp[,1] <- 1
   }
-  
   
   # transform shp to same CRS as the area raster, r (UTM33)
   shp <- shp %>%
