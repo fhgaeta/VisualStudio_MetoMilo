@@ -10,7 +10,7 @@ source("function_rasterise_metomilo.R")
 user <- Sys.getenv("USERNAME")
 Sys.setlocale("LC_ALL", "en_US.UTF-8")
 
-
+local_folder <- paste0("C:/Users/FEG/Downloads/TEST_Metomilo_Local/")
 folder_base <- paste0("C:/Users/", user, "/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe -",
                       "METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/",
                       "Data collection/")
@@ -50,7 +50,7 @@ shp_octocoral_all <- purrr::map(
 # List of species to rasterize
 species_list <- shp_octocoral_all %>%
   filter(art %in% c("Paragorgia arborea",
-                    "Primnoa resedaeformis")) %>%
+                    "Primnoa resedaeformis", "Paramuricea placomus")) %>%
            distinct(art) %>%
            pull(art) %>%
            as.character()
@@ -69,7 +69,7 @@ for(i in seq_along(species_list)){
   shp <- shp_octocoral_all %>% filter(art == species)
 
   # Define output CSV file name
-  file_out <- paste0(folder_output_csv, species, "_Salten", ".csv")
+  file_out <- paste0(local_folder, "14.1_", species, "_Salten", ".csv")
 
   # Rasterize and save CSV
   df <- rasterise_mm(r_area, shp, variable = "art", 
@@ -107,7 +107,7 @@ for(i in seq_along(species_list)){
   shp <- shp_smb_all %>% filter(indicatorvme == "Nephtheidae medow")
 
   # Define output CSV file name
-  file_out <- paste0(folder_output_csv, species, "_Salten", ".csv")
+  file_out <- paste0(local_folder, "14.1_", species, "_Salten", ".csv")
 
   # Rasterize and save CSV
   df <- rasterise_mm(r_area, shp, variable = "indicatorvme", 

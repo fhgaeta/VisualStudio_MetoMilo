@@ -35,34 +35,6 @@ r_area <- terra::rast(paste0(folder_area, "5109_02_03.tif"))
 db_layers <- sf::st_layers(db_path) 
 db_layers <- db_layers$name
 
-# read individual layers...
-
-# - (1) --------------------------
-# to process only one layer, then set i to the index
-# of the layer you want and just run the 
-# code inside the for loop
-
-i <- 2
-
-# select current layer
-layer <- db_layers[i]
-cat(paste0(layer,"\n"))
-
-# load shape for selected layer
-shp <- sf::st_read(layer, dsn=db_path, quiet=T)
-
-df <-  rasterise_mm(r_area, shp, variable = "estimatedvalue")
-
-file_out <- paste0(folder_output_csv, "10.2_", layer, "_Hardanger", ".csv")
-
-rasterise_mm(r_area, shp, variable = "estimatedvalue", 
-             return_df = FALSE, filecsv = file_out)
-
-# save the data to a csv file
-# define the path to the output folder
-
-write.csv(df, file_out)
-
 
 # - (2) --------------------------
 # if you want to run this for ALL the layers in the DB

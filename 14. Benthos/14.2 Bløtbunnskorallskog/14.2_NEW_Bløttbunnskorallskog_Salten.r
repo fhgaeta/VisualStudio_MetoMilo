@@ -9,6 +9,7 @@ Sys.setlocale("LC_ALL", "en_US.UTF-8")
 
 # Get user name
 user <- Sys.getenv("USERNAME")
+local_folder <- paste0("C:/Users/FEG/Downloads/TEST_Metomilo_Local/")
 
 folder_base <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe - METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/Data collection/"
 folder_area <- paste0(folder_base, "Focus areas/grid_v3/raster/")
@@ -36,7 +37,7 @@ file_path_gdb_smb <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ec
 # Load the 100m study area raster
 r_area <- terra::rast(paste0(basefolder_od, "/Focus areas/grid_mask/Raster/Nord-Salten_1108_08.tif"))
 
-#load octocoral data - Only hornkoraller tilgjengelig i Hardanger
+#load octocoral data - 
 db_layers <- sf::st_layers(file_Hornkorall)$name
 shp_octocoral_all <- purrr::map(
   db_layers, sf::st_read, dsn = file_Hornkorall, quiet = TRUE
@@ -45,7 +46,7 @@ shp_octocoral_all <- purrr::map(
 # List of species to rasterize
 species_list <- shp_octocoral_all %>%
   filter(art %in% c("Isidella lofotensis",
-                    "Radicipes gracilis")) %>%
+                    "Radicipes")) %>%
   distinct(art) %>%
   pull(art) %>%
   as.character()
@@ -59,7 +60,7 @@ for (i in seq_along(species_list)) {
   shp <- shp_octocoral_all %>% filter(art == species)
 
   # Define output CSV file name
-  file_out <- paste0(folder_output_csv, "14.2 ", species, "_Salten", ".csv")
+  file_out <- paste0(local_folder, "14.2 ", species, "_Salten", ".csv")
 
   # Rasterize and save CSV
   df <- rasterise_mm(r_area, shp, variable = "art", return_df = TRUE, filecsv = file_out)

@@ -9,6 +9,7 @@ Sys.setlocale("LC_ALL", "en_US.UTF-8")
 
 # Get user name
 user <- Sys.getenv("USERNAME")
+local_folder <- paste0("C:/Users/FEG/Downloads/TEST_Metomilo_Local/")
 
 folder_base <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe - METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/Data collection/"
 folder_area <- paste0(folder_base, "Focus areas/grid_v3/raster/")

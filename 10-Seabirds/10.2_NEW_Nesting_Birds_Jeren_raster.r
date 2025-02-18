@@ -1,3 +1,5 @@
+#Crash when running this script.
+
 library(dplyr)
 library(sf)
 library(terra)
@@ -50,11 +52,13 @@ for (i in seq_along(db_layers)) {
   shp <- sf::st_read(layer, dsn = db_path, quiet = TRUE)
 
   # define output csv file name
-   file_out <- paste0(local_folder, "10.2_", layer, "Jæren", ".csv")
+  file_out <- paste0(local_folder, "10.2_", layer, "Jæren", ".csv")
 
   # rasterise and save csv
   df <- rasterise_mm(r_area, shp, variable = "estimatedvalue", 
                      return_df = TRUE, filecsv = file_out)
+  # Get the number of features processed
+  n <- nrow(df)
   cat(paste0(n,"\n"))
 
   # save the data to a csv file

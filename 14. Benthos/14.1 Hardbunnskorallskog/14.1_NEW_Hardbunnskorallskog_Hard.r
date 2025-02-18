@@ -10,7 +10,7 @@ source("function_rasterise_metomilo.R")
 user <- Sys.getenv("USERNAME")
 
 folder_base <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe - METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/Data collection/"
-
+local_folder <- paste0("C:/Users/FEG/Downloads/TEST_Metomilo_Local/")
 folder_area <- paste0(folder_base,"Focus areas/grid_v3/raster/")
 folder_output_csv <- paste0(folder_base, "../Analyses/input_data/ecosystem_components/")
 basefolder_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/"
@@ -61,7 +61,7 @@ for(i in seq_along(species_list)){
   shp <- shp_octocoral_all %>% filter(art == species)
 
   # Define output CSV file name
-  file_out <- paste0(folder_output_csv, species, "_Hardanger", ".csv")
+  file_out <- paste0(local_folder, "14.1_", species, "_Hardanger", ".csv")
 
   # Rasterize and save CSV
   df <- rasterise_mm(r_area, shp, variable = "art", 

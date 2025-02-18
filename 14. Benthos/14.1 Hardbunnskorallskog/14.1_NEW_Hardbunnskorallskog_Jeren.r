@@ -10,7 +10,7 @@ source("function_rasterise_metomilo.R")
 user <- Sys.getenv("USERNAME")
 
 folder_base <- "C:/Users/FEG/NIVA/METOMILO - Prosjektgruppe - METOMILO - Prosjektgruppe - METOMILO/AP1 Kartlegge samlet påvirkning av menneskelige aktiviteter/Data collection/"
-
+local_folder <- paste0("C:/Users/FEG/Downloads/TEST_Metomilo_Local/")
 folder_area <- paste0(folder_base,"Focus areas/grid_v3/raster/")
 folder_output_csv <- paste0(folder_base, "../Analyses/input_data/ecosystem_components/")
 basefolder_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/"
@@ -32,7 +32,7 @@ gdb_coral_garden <- read_sf(file_path_gdb_cor_gard)
 
 # --------- load the 100m study area raster ----
 r_area <- terra::rast(paste0(folder_area, "Jæren_5104_01.tif"))
-r_area <- terra::rast(paste0(basefolder_od, "/Focus areas/grid_mask/Raster/Jæren_5104_01.tif"))
+#r_area <- terra::rast(paste0(basefolder_od, "/Focus areas/grid_mask/Raster/Jæren_5104_01.tif"))
 
 
 # ---------- read data layers ----------------
@@ -66,7 +66,7 @@ for(i in seq_along(species_list)){
   shp <- shp_octocoral_all %>% filter(art == species)
 
   # Define output CSV file name
-  file_out <- paste0(folder_output_csv, species, "_Jeren", ".csv")
+  file_out <- paste0(local_folder, "14.1_", species, "_Jeren", ".csv")
 
   # Rasterize and save CSV
   df <- rasterise_mm(r_area, shp, variable = "art", 
@@ -84,26 +84,26 @@ shp_coral_garden_all <- purrr::map(
 ) %>% bind_rows()
 
 # List of species to rasterize
-species_list_2 <- shp_smb_proj_inters %>%
+Habitat_list_2 <- gdb_coral_garden %>%
   filter(sarbarthabitat %in% c("Korallskog",
-                   "Korallskog/Reirskjell")) %>%
+                   "Korallskog/Reirskjell", "Reirskjell")) %>%
   distinct(sarbarthabitat) %>%
   pull(sarbarthabitat) %>%
   as.character()
 
-for(i in seq_along(species_list_2)){
+for(i in seq_along(Habitat_list_2)){
   # Select current species
-  species <- species_list_2[i]
-  cat(paste0(species, ": "))
+  Habitat <- Habitat_list_2[i]
+  cat(paste0(Habitat, ": "))
 
   # Filter shape for selected species
-  shp <- shp_octocoral_all %>% filter(art == species)
+  shp <- gdb_coral_garden %>% filter(sarbarthabitat == Habitat)
 
   # Define output CSV file name
-  file_out <- paste0(folder_output_csv, species, "_Jeren", ".csv")
+  file_out <- paste0(local_folder,"14.1_", Habitat, "_Jeren", ".csv")
 
   # Rasterize and save CSV
-  df <- rasterise_mm(r_area, shp, variable = "art", 
+  df <- rasterise_mm(r_area, shp, variable = "sarbarthabitat", 
                      return_df = TRUE, filecsv = file_out)
   cat(paste0(nrow(df), "\n"))
 
