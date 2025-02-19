@@ -21,7 +21,7 @@ folder_output_csv <- paste0(folder_base, "../Analyses/input_data/ecosystem_compo
 basefolder_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/"
 db_path <- paste0("C:/Users/FEG/Downloads/19.2 SarbareMarineBunndyrObs_FGDB.gdb")
 # Define the path to the GDB file  DN-19 Hard
-file_path_gdb <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/16. Naturtyper. DN-Håndbok 19/16.1 Vestlandet DN nat.19/Naturtyper_hb19_EgnDef_4326_FILEGDB.gdb"
+file_path_gdb <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/16. Naturtyper. DN-Håndbok 19/16.1 Rogaland Naturtyper_hb19_11_FILEGDB/Naturtyper_hb19_11_rogaland_25832_FILEGDB.gdb"
 
 #define the path to 21 Marine grunnkart -Sårbare habitater
 file_path_gdb_sar_hab <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/21. Marine grunnkart - Sårbare habitater/SarbareMarineHabitater_FGDB.gdb"
