@@ -1,10 +1,4 @@
-#creating a script for plot the remaining natur habitats - Salten
-#14.11 Ice marginal deposits
-#14.11 Soft sediments in the littoral zone
-#14.11 Shellsand
-#14.11 Øyster areas
-#14.11 Large scallop occurences 
-
+# Load necessary libraries
 library(dplyr)
 library(sf)
 library(terra)
@@ -22,12 +16,8 @@ folder_area <- paste0(folder_base, "Focus areas/grid_v3/raster/")
 folder_output_csv <- paste0(folder_base, "../Analyses/input_data/ecosystem_components/")
 basefolder_od <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/"
 
-# Define the path to the GDB file  DN-19 Salten
-file_path_gdb <- paste0(
-  "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/",
-  "Ecological components data/16. Naturtyper. DN-Håndbok 19/",
-  "16.1 Nord Salten DN Nat.19/Naturtyper_hb19_EgnDef_4326_FILEGDB.gdb"
-)
+# Define the path to the shapefiles
+file_path_gdb <- "C:/Users/FEG/OneDrive - NIVA/METOMILO_OneDrive/GIS Data/Ecological components data/22. Species_habitats and areas of conservation/22.4 marin_vp_oppstart/marin_vp_oppstart.shp"
 
 # study area raster files
 # "5109_02_03.tif" - combined Sunnhordaland & Hardanger            
@@ -36,69 +26,60 @@ file_path_gdb <- paste0(
 # "Jæren_5104_01.tif"         
 # "Nord-Salten_1108_08.tif"   
 # "Sunnhordaland_5109_02.tif"
-# Load the 100m study area raster
-r_area <- terra::rast(paste0(basefolder_od, "/Focus areas/grid_mask/Raster/Nord-Salten_1108_08.tif"))
 
-# Load DN19
+# Load the 100m study area raster
+r_area <- terra::rast(paste0(basefolder_od, "/Focus areas/grid_mask/Raster/5109_02_03_area.tif"))
+
+# Load EUSeaMap_2023
 db_layers <- sf::st_layers(file_path_gdb)$name
-shp_DN19 <- purrr::map(
+shp <- purrr::map(
   db_layers, sf::st_read, dsn = file_path_gdb, quiet = TRUE
 ) %>% 
   bind_rows() %>% 
   sf::st_make_valid()
 
-# List all categories present in the column "naturtype"
-categories <- shp_DN19 %>%
-  distinct(naturtype) %>%
-  pull(naturtype) %>%
+# List all categories present in the column "kategori"
+categories <- shp %>%
+  distinct(kategori) %>%
+  pull(kategori) %>%
   as.character()
 
-cat("Categories in 'naturtype':\n")
+cat("Categories in 'fjord':\n")
 cat(paste(categories, collapse = "\n"))
 
 # List of species to rasterize
-species_list <- shp_DN19 %>%
-  filter(naturtype %in% c("skjellsandforekomster",
-  "størreKamskjellforekomster",
-  "poller")) %>%
-           distinct(naturtype) %>%
-           pull(naturtype) %>%
-           as.character()
-
-# Function to sanitize file names
-sanitize_filename <- function(name) {
-  gsub("[^[:alnum:]_]", "_", name)
-}
-
-# List of species to rasterize
-for (i in seq_along(species_list)) {
+for (i in seq_along(categories)) {
     # Select current species
-    habitat <- species_list[i]
+    habitat <- categories[i]
     cat(paste0(habitat, ": "))
 
     # Filter shape for selected species
-    shp <- shp_DN19 %>% filter(naturtype == habitat)
+    shp_filtered <- shp %>% filter(kategori == habitat)
 
     # Check if shapefile data is empty
-    if (nrow(shp) == 0) {
+    if (nrow(shp_filtered) == 0) {
         cat("No data found for habitat: ", habitat, "\n")
         next
     }
 
     # Check if shapefile data falls within the raster extent
-    if (is.null(terra::intersect(r_area, shp))) {
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp_filtered)))) {
         cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
         next
     }
     
-  # Define output CSV file name
-  file_out <- paste0(local_folder, "14.11_", sanitize_filename(habitat), "_Salten.csv")
-  
+    # Convert habitat name to valid encoding and replace spaces with underscores
+    habitat_clean <- iconv(habitat, from = "UTF-8", to = "ASCII//TRANSLIT")
+    habitat_clean <- gsub(" ", "_", habitat_clean)
+    
+    # Define output CSV file name
+    file_out <- paste0(local_folder, "15.3_", habitat_clean, "_Hardanger.csv")
+    file_out <- normalizePath(file_out, mustWork = FALSE)
 
-       # Rasterize and save CSV
-    df <- rasterise_mm(r_area, shp, variable = "naturtype", return_df = TRUE, filecsv = file_out)
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp_filtered, variable = "kategori", return_df = TRUE, filecsv = file_out)
     cat(paste0(nrow(df), "\n"))
 
     # Save the data to a CSV file
-    write.csv(df, file_out)
+    write.csv(df, file_out, fileEncoding = "UTF-8")
 }
