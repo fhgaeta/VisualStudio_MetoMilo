@@ -73,10 +73,12 @@ rpts <- rpts %>%
 # Check which points in rpts are within the effect distance from the source points
 df_dist <- sf::st_is_within_distance(rpts, shp, dist=effect_dist, sparse=F) %>% 
   as.data.frame()
+
 # The result is a matrix with TRUE/FALSE values. We need to convert this to a data frame
 nc <- ncol(df_dist)
 # Add an id column to the data frame
 df_dist$id_filtered <- 1:nrow(df_dist)
+
 # Convert the matrix to a long format
 df_dist <- df_dist %>% 
   pivot_longer(cols=all_of(1:nc), names_to = "id_source", names_prefix = "V", values_to = "value", names_transform = as.integer)
