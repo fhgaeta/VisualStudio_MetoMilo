@@ -46,22 +46,9 @@ categories <- shp_sea_map_23 %>%
 cat("Categories in 'All2019DL2':\n")
 cat(paste(categories, collapse = "\n"))
 
-# List of species to rasterize
-species_list <- shp_sea_map_23 %>%
-  filter(All2019DL2 %in% c("Infralittoral seabed",
-  "MD3: Offshore circalittoral coarse sediment",
-  "Offshore circalittoral seabed",
-  "Circalittoral seabed",
-  "MB1: Infralittoral rock",
-  "MC1: Circalittoral rock",
-  "MD1: Offshore circalittoral rock",
-  "ME1: Upper bathyal rock",
-  "MD6: Offshore circalittoral mud",
-  "MB3: Infralittoral coarse sediment",
-  "MC3: Circalittoral coarse sediment",
-  "MC6: Circalittoral mud",
-  "MB6: Infralittoral mud",
-  "Upper bathyal seabed")) %>%
+# List of species to rasterize according to Ecomar / Metomilo: Infralittoral seabed (soft and hard bottom)
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c("Infralittoral seabed")) %>%
            distinct(All2019DL2) %>%
            pull(All2019DL2) %>%
            as.character()
@@ -72,10 +59,10 @@ sanitize_filename <- function(name) {
   gsub("[^[:alnum:]_]", "_", name)
 }
 
-# List of species to rasterize
-for (i in seq_along(species_list)) {
+# List of habitat to rasterize
+
     # Select current species
-    habitat <- species_list[i]
+    habitat <- habitat_list
     cat(paste0(habitat, ": "))
 
     # Filter shape for selected species
@@ -103,4 +90,381 @@ for (i in seq_along(species_list)) {
 
     # Save the data to a CSV file
     write.csv(df, file_out)
+
+# List of habitat to rasterize according to Ecomar / Metomilo: Infralittoral mud
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c(
+  "MB6: Infralittoral mud")) %>%
+           distinct(All2019DL2) %>%
+           pull(All2019DL2) %>%
+           as.character()
+
+
+# Function to sanitize file names
+sanitize_filename <- function(name) {
+  gsub("[^[:alnum:]_]", "_", name)
 }
+
+    # Select current species
+    habitat <- habitat_list
+    cat(paste0(habitat, ": "))
+
+    # Filter shape for selected species
+    shp <- shp_sea_map_23 %>% filter(All2019DL2 == habitat)
+
+    # Check if shapefile data is empty
+    if (nrow(shp) == 0) {
+        cat("No data found for habitat: ", habitat, "\n")
+        next
+    }
+
+    # Check if shapefile data falls within the raster extent
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp)))) {
+        cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
+        next
+    }
+    
+  # Define output CSV file name
+  file_out <- paste0(local_folder, "14.10_", sanitize_filename(habitat), "_Hardanger.csv")
+  
+
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp, variable = "All2019DL2", return_df = TRUE, filecsv = file_out)
+    cat(paste0(nrow(df), "\n"))
+
+    # Save the data to a CSV file
+    write.csv(df, file_out)
+
+
+# List of species to rasterize according to Ecomar / Metomilo:  Infralittoral coarse sediments
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c(
+  "MB3: Infralittoral coarse sediment"
+  )) %>%
+           distinct(All2019DL2) %>%
+           pull(All2019DL2) %>%
+           as.character()
+
+
+# Function to sanitize file names
+sanitize_filename <- function(name) {
+  gsub("[^[:alnum:]_]", "_", name)
+}
+
+# List of habitat to rasterize
+
+    # Select current species
+    habitat <- habitat_list
+    cat(paste0(habitat, ": "))
+
+    # Filter shape for selected species
+    shp <- shp_sea_map_23 %>% filter(All2019DL2 == habitat)
+
+    # Check if shapefile data is empty
+    if (nrow(shp) == 0) {
+        cat("No data found for habitat: ", habitat, "\n")
+        next
+    }
+
+    # Check if shapefile data falls within the raster extent
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp)))) {
+        cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
+        next
+    }
+    
+  # Define output CSV file name
+  file_out <- paste0(local_folder, "14.10_", sanitize_filename(habitat), "_Hardanger.csv")
+  
+
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp, variable = "All2019DL2", return_df = TRUE, filecsv = file_out)
+    cat(paste0(nrow(df), "\n"))
+
+    # Save the data to a CSV file
+    write.csv(df, file_out)
+
+# List of species to rasterize according to Ecomar / Metomilo: Infralittoral rocks and biogenic reefs
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c(
+  "MB1: Infralittoral rock"
+  )) %>%
+           distinct(All2019DL2) %>%
+           pull(All2019DL2) %>%
+           as.character()
+
+
+# Function to sanitize file names
+sanitize_filename <- function(name) {
+  gsub("[^[:alnum:]_]", "_", name)
+}
+
+# List of habitat to rasterize
+
+    # Select current species
+    habitat <- habitat_list
+    cat(paste0(habitat, ": "))
+
+    # Filter shape for selected species
+    shp <- shp_sea_map_23 %>% filter(All2019DL2 == habitat)
+
+    # Check if shapefile data is empty
+    if (nrow(shp) == 0) {
+        cat("No data found for habitat: ", habitat, "\n")
+        next
+    }
+
+    # Check if shapefile data falls within the raster extent
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp)))) {
+        cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
+        next
+    }
+    
+  # Define output CSV file name
+  file_out <- paste0(local_folder, "14.10_", sanitize_filename(habitat), "_Hardanger.csv")
+  
+
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp, variable = "All2019DL2", return_df = TRUE, filecsv = file_out)
+    cat(paste0(nrow(df), "\n"))
+
+    # Save the data to a CSV file
+    write.csv(df, file_out)
+
+
+# List of species to rasterize according to Ecomar / Metomilo: Circalittoral seabed (soft & hardbottom, includes offshore circalittoral seabed)
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c(
+  "Offshore circalittoral seabed",
+  "Circalittoral seabed"
+  )) %>%
+           distinct(All2019DL2) %>%
+           pull(All2019DL2) %>%
+           as.character()
+
+
+# Function to sanitize file names
+sanitize_filename <- function(name) {
+  gsub("[^[:alnum:]_]", "_", name)
+}
+
+# List of habitat to rasterize
+
+    # Select current species
+    habitat <- habitat_list
+    cat(paste0(habitat, ": "))
+
+    # Filter shape for selected species
+    shp <- shp_sea_map_23 %>% filter(All2019DL2 == habitat)
+
+    # Check if shapefile data is empty
+    if (nrow(shp) == 0) {
+        cat("No data found for habitat: ", habitat, "\n")
+        next
+    }
+
+    # Check if shapefile data falls within the raster extent
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp)))) {
+        cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
+        next
+    }
+    
+  # Define output CSV file name
+  file_out <- paste0(local_folder, "14.10_", sanitize_filename(habitat), "_Hardanger.csv")
+  
+
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp, variable = "All2019DL2", return_df = TRUE, filecsv = file_out)
+    cat(paste0(nrow(df), "\n"))
+
+    # Save the data to a CSV file
+    write.csv(df, file_out)
+
+# List of species to rasterize according to Ecomar / Metomilo: Circalittoral mud (includes Offshore circalittoral mud)
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c(
+  "MD6: Offshore circalittoral mud",
+  "MC6: Circalittoral mud",
+  )) %>%
+           distinct(All2019DL2) %>%
+           pull(All2019DL2) %>%
+           as.character()
+
+
+# Function to sanitize file names
+sanitize_filename <- function(name) {
+  gsub("[^[:alnum:]_]", "_", name)
+}
+
+# List of habitat to rasterize
+
+    # Select current species
+    habitat <- habitat_list
+    cat(paste0(habitat, ": "))
+
+    # Filter shape for selected species
+    shp <- shp_sea_map_23 %>% filter(All2019DL2 == habitat)
+
+    # Check if shapefile data is empty
+    if (nrow(shp) == 0) {
+        cat("No data found for habitat: ", habitat, "\n")
+        next
+    }
+
+    # Check if shapefile data falls within the raster extent
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp)))) {
+        cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
+        next
+    }
+    
+  # Define output CSV file name
+  file_out <- paste0(local_folder, "14.10_", sanitize_filename(habitat), "_Hardanger.csv")
+  
+
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp, variable = "All2019DL2", return_df = TRUE, filecsv = file_out)
+    cat(paste0(nrow(df), "\n"))
+
+    # Save the data to a CSV file
+    write.csv(df, file_out)
+
+    # List of species to rasterize according to Ecomar / Metomilo:  Circalittoral coarse sediments (includes Offshore circalittoral coarse sediments)
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c(
+  "MD3: Offshore circalittoral coarse sediment",
+  "MC3: Circalittoral coarse sediment"
+  )) %>%
+           distinct(All2019DL2) %>%
+           pull(All2019DL2) %>%
+           as.character()
+
+
+# Function to sanitize file names
+sanitize_filename <- function(name) {
+  gsub("[^[:alnum:]_]", "_", name)
+}
+
+# List of habitat to rasterize
+
+    # Select current species
+    habitat <- habitat_list
+    cat(paste0(habitat, ": "))
+
+    # Filter shape for selected species
+    shp <- shp_sea_map_23 %>% filter(All2019DL2 == habitat)
+
+    # Check if shapefile data is empty
+    if (nrow(shp) == 0) {
+        cat("No data found for habitat: ", habitat, "\n")
+        next
+    }
+
+    # Check if shapefile data falls within the raster extent
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp)))) {
+        cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
+        next
+    }
+    
+  # Define output CSV file name
+  file_out <- paste0(local_folder, "14.10_", sanitize_filename(habitat), "_Hardanger.csv")
+  
+
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp, variable = "All2019DL2", return_df = TRUE, filecsv = file_out)
+    cat(paste0(nrow(df), "\n"))
+
+    # Save the data to a CSV file
+    write.csv(df, file_out)
+
+# List of species to rasterize according to Ecomar / Metomilo: Circalittoral rocks and biogenic reefs
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c(
+  "MC1: Circalittoral rock",
+  "MD1: Offshore circalittoral rock")) %>%
+           distinct(All2019DL2) %>%
+           pull(All2019DL2) %>%
+           as.character()
+
+
+# Function to sanitize file names
+sanitize_filename <- function(name) {
+  gsub("[^[:alnum:]_]", "_", name)
+}
+
+# List of habitat to rasterize
+
+    # Select current species
+    habitat <- habitat_list
+    cat(paste0(habitat, ": "))
+
+    # Filter shape for selected species
+    shp <- shp_sea_map_23 %>% filter(All2019DL2 == habitat)
+
+    # Check if shapefile data is empty
+    if (nrow(shp) == 0) {
+        cat("No data found for habitat: ", habitat, "\n")
+        next
+    }
+
+    # Check if shapefile data falls within the raster extent
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp)))) {
+        cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
+        next
+    }
+    
+  # Define output CSV file name
+  file_out <- paste0(local_folder, "14.10_", sanitize_filename(habitat), "_Hardanger.csv")
+  
+
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp, variable = "All2019DL2", return_df = TRUE, filecsv = file_out)
+    cat(paste0(nrow(df), "\n"))
+
+    # Save the data to a CSV file
+    write.csv(df, file_out)
+
+# List of species to rasterize according to Ecomar / Metomilo: Upper bathyal sediments
+habitat_list <- shp_sea_map_23 %>%
+  filter(All2019DL2 %in% c(
+  "ME1: Upper bathyal rock",
+  "Upper bathyal seabed")) %>%
+           distinct(All2019DL2) %>%
+           pull(All2019DL2) %>%
+           as.character()
+
+
+# Function to sanitize file names
+sanitize_filename <- function(name) {
+  gsub("[^[:alnum:]_]", "_", name)
+}
+
+# List of habitat to rasterize
+
+    # Select current species
+    habitat <- habitat_list
+    cat(paste0(habitat, ": "))
+
+    # Filter shape for selected species
+    shp <- shp_sea_map_23 %>% filter(All2019DL2 == habitat)
+
+    # Check if shapefile data is empty
+    if (nrow(shp) == 0) {
+        cat("No data found for habitat: ", habitat, "\n")
+        next
+    }
+
+    # Check if shapefile data falls within the raster extent
+    if (is.null(terra::intersect(terra::ext(r_area), terra::ext(shp)))) {
+        cat("Shapefile data falls outside the raster extent for habitat: ", habitat, "\n")
+        next
+    }
+    
+  # Define output CSV file name
+  file_out <- paste0(local_folder, "14.10_", sanitize_filename(habitat), "_Hardanger.csv")
+  
+
+    # Rasterize and save CSV
+    df <- rasterise_mm(r_area, shp, variable = "All2019DL2", return_df = TRUE, filecsv = file_out)
+    cat(paste0(nrow(df), "\n"))
+
+    # Save the data to a CSV file
+    write.csv(df, file_out)
